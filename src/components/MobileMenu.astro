@@ -1,0 +1,203 @@
+---
+import { type Lang } from '../i18n/ui';
+import { useTranslations } from '../i18n/utils';
+import LanguageSwitch from './LanguageSwitch.astro';
+
+export interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<mobile-menu-drawer>
+  <div
+    id="drawer-container"
+    data-state="closed"
+    class="fixed inset-0 z-50 pointer-events-none transition-opacity duration-300 opacity-0 data-[state=open]:pointer-events-auto data-[state=open]:opacity-100"
+    aria-hidden="true"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Mobile Navigation Menu"
+  >
+    <!-- Backdrop -->
+    <div
+      id="drawer-backdrop"
+      class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm cursor-pointer"
+    ></div>
+
+    <!-- Panel -->
+    <div
+      id="drawer-panel"
+      class="absolute right-0 top-0 bottom-0 w-full max-w-xs bg-slate-900 border-l border-slate-800 p-6 flex flex-col justify-between transform translate-x-full transition-transform duration-300 ease-out shadow-2xl data-[state=open]:translate-x-0"
+    >
+      <div class="flex flex-col gap-6">
+        <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+          <span class="text-sm font-semibold tracking-wider text-slate-400 uppercase">Меню / Menu</span>
+          <button
+            type="button"
+            id="drawer-close"
+            class="p-2 text-slate-400 hover:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+            aria-label="Close menu"
+          >
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Links -->
+        <nav class="flex flex-col gap-4 text-base font-medium">
+          <a href="#features" class="drawer-link text-slate-300 hover:text-white py-2 transition-colors">
+            {t('nav.features')}
+          </a>
+          <a href="#faq" class="drawer-link text-slate-300 hover:text-white py-2 transition-colors">
+            {t('nav.faq')}
+          </a>
+          <a href="#contact" class="drawer-link text-slate-300 hover:text-white py-2 transition-colors">
+            {t('nav.contact')}
+          </a>
+        </nav>
+      </div>
+
+      <div class="pt-6 border-t border-slate-800 flex flex-col gap-4">
+        <div class="flex items-center justify-between">
+          <span class="text-xs text-slate-400">Язык / Language:</span>
+          <LanguageSwitch currentLang={lang} />
+        </div>
+
+        <button
+          type="button"
+          data-open-modal="contact-modal"
+          class="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-center text-sm transition-colors shadow-lg shadow-blue-600/30 cursor-pointer"
+        >
+          {t('nav.cta')}
+        </button>
+      </div>
+    </div>
+  </div>
+</mobile-menu-drawer>
+
+<script>
+  class MobileMenuDrawer extends HTMLElement {
+    private container: HTMLElement | null = null;
+    private panel: HTMLElement | null = null;
+    private backdrop: HTMLElement | null = null;
+    private closeBtn: HTMLElement | null = null;
+    private previousActiveElement: HTMLElement | null = null;
+
+    private boundOpenHandler = () => this.open();
+    private boundCloseHandler = () => this.close();
+    private boundKeyHandler = (e: KeyboardEvent) => this.handleKeyDown(e);
+    private boundTransitionEnd = (e: TransitionEvent) => this.handleTransitionEnd(e);
+
+    connectedCallback() {
+      this.container = this.querySelector('#drawer-container');
+      this.panel = this.querySelector('#drawer-panel');
+      this.backdrop = this.querySelector('#drawer-backdrop');
+      this.closeBtn = this.querySelector('#drawer-close');
+
+      window.addEventListener('open-mobile-menu', this.boundOpenHandler);
+      this.closeBtn?.addEventListener('click', this.boundCloseHandler);
+      this.backdrop?.addEventListener('click', this.boundCloseHandler);
+      this.panel?.addEventListener('transitionend', this.boundTransitionEnd);
+
+      const links = this.querySelectorAll('.drawer-link');
+      links.forEach((link) => {
+        link.addEventListener('click', this.boundCloseHandler);
+      });
+
+      const ctaBtn = this.querySelector('[data-open-modal]');
+      ctaBtn?.addEventListener('click', () => {
+        this.close();
+        window.dispatchEvent(new CustomEvent('open-modal', { detail: 'contact-modal' }));
+      });
+    }
+
+    disconnectedCallback() {
+      window.removeEventListener('open-mobile-menu', this.boundOpenHandler);
+      this.closeBtn?.removeEventListener('click', this.boundCloseHandler);
+      this.backdrop?.removeEventListener('click', this.boundCloseHandler);
+      this.panel?.removeEventListener('transitionend', this.boundTransitionEnd);
+      document.removeEventListener('keydown', this.boundKeyHandler);
+    }
+
+    private getFocusableElements(): HTMLElement[] {
+      if (!this.panel) return [];
+      const focusableSelectors = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+      return Array.from(this.panel.querySelectorAll<HTMLElement>(focusableSelectors));
+    }
+
+    private handleKeyDown(e: KeyboardEvent) {
+      if (this.container?.getAttribute('data-state') !== 'open') return;
+
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        this.close();
+        return;
+      }
+
+      if (e.key === 'Tab') {
+        const focusables = this.getFocusableElements();
+        if (focusables.length === 0) return;
+
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          }
+        } else {
+          if (document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
+      }
+    }
+
+    open() {
+      if (!this.container || !this.panel) return;
+      this.previousActiveElement = document.activeElement as HTMLElement | null;
+
+      this.container.setAttribute('data-state', 'open');
+      this.panel.setAttribute('data-state', 'open');
+      this.container.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+
+      document.addEventListener('keydown', this.boundKeyHandler);
+
+      // Focus first actionable element inside panel
+      requestAnimationFrame(() => {
+        this.closeBtn?.focus();
+      });
+    }
+
+    close() {
+      if (!this.container || !this.panel) return;
+      this.container.setAttribute('data-state', 'closed');
+      this.panel.setAttribute('data-state', 'closed');
+      this.container.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+
+      document.removeEventListener('keydown', this.boundKeyHandler);
+    }
+
+    private handleTransitionEnd(e: TransitionEvent) {
+      // Ensure we only react to the transform transition of the panel itself
+      if (e.target !== this.panel || e.propertyName !== 'transform') return;
+
+      if (this.container?.getAttribute('data-state') === 'closed') {
+        // Return focus cleanly to the trigger button that opened the menu
+        this.previousActiveElement?.focus();
+      }
+    }
+  }
+
+  if (!customElements.get('mobile-menu-drawer')) {
+    customElements.define('mobile-menu-drawer', MobileMenuDrawer);
+  }
+</script>
