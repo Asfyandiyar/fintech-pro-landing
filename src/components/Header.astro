@@ -1,0 +1,113 @@
+---
+import { type Lang } from '../i18n/ui';
+import { useTranslations } from '../i18n/utils';
+import LanguageSwitch from './LanguageSwitch.astro';
+
+export interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<main-header class="contents">
+  <header id="main-header" class="sticky top-0 z-40 w-full transition-all duration-300 border-b border-transparent">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <!-- Logo -->
+      <a href={`/${lang}/`} class="flex items-center gap-3 group focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg py-1 px-2" aria-label="FinTech Solution Home">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-105 transition-transform duration-200">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-lg font-bold tracking-tight text-white leading-tight">FinTech<span class="text-blue-500">Pro</span></span>
+          <span class="text-[10px] text-slate-400 font-mono tracking-widest uppercase">Settlements</span>
+        </div>
+      </a>
+
+      <!-- Desktop Navigation -->
+      <nav class="hidden md:flex items-center gap-8 text-sm font-medium">
+        <a href="#features" class="text-slate-300 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-1.5 py-1">
+          {t('nav.features')}
+        </a>
+        <a href="#faq" class="text-slate-300 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-1.5 py-1">
+          {t('nav.faq')}
+        </a>
+        <a href="#contact" class="text-slate-300 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-1.5 py-1">
+          {t('nav.contact')}
+        </a>
+      </nav>
+
+      <!-- Right Actions -->
+      <div class="hidden md:flex items-center gap-4">
+        <LanguageSwitch currentLang={lang} />
+        <button
+          type="button"
+          data-open-modal="contact-modal"
+          class="open-modal-trigger px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm transition-all duration-200 shadow-md shadow-blue-600/20 hover:shadow-lg hover:shadow-blue-600/30 active:scale-98 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-slate-950"
+        >
+          {t('nav.cta')}
+        </button>
+      </div>
+
+      <!-- Mobile Hamburger Button -->
+      <div class="flex items-center gap-2 md:hidden">
+        <LanguageSwitch currentLang={lang} />
+        <button
+          type="button"
+          id="mobile-menu-trigger"
+          class="p-2 text-slate-400 hover:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+          aria-label="Open navigation menu"
+          aria-expanded="false"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+</main-header>
+
+<script>
+  class MainHeader extends HTMLElement {
+    private header: HTMLElement | null = null;
+    private mobileTrigger: HTMLElement | null = null;
+
+    private handleScroll = () => {
+      if (!this.header) return;
+      if (window.scrollY > 20) {
+        this.header.classList.add('bg-slate-950/80', 'backdrop-blur-md', 'border-slate-800/80', 'shadow-lg', 'shadow-black/20');
+        this.header.classList.remove('border-transparent');
+      } else {
+        this.header.classList.remove('bg-slate-950/80', 'backdrop-blur-md', 'border-slate-800/80', 'shadow-lg', 'shadow-black/20');
+        this.header.classList.add('border-transparent');
+      }
+    };
+
+    private handleMobileClick = () => {
+      window.dispatchEvent(new CustomEvent('open-mobile-menu'));
+    };
+
+    connectedCallback() {
+      this.header = this.querySelector('#main-header');
+      this.mobileTrigger = this.querySelector('#mobile-menu-trigger');
+
+      window.addEventListener('scroll', this.handleScroll, { passive: true });
+      this.handleScroll();
+
+      this.mobileTrigger?.addEventListener('click', this.handleMobileClick);
+    }
+
+    disconnectedCallback() {
+      window.removeEventListener('scroll', this.handleScroll);
+      this.mobileTrigger?.removeEventListener('click', this.handleMobileClick);
+    }
+  }
+
+  if (!customElements.get('main-header')) {
+    customElements.define('main-header', MainHeader);
+  }
+</script>
