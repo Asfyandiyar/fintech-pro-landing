@@ -1,0 +1,66 @@
+---
+import { type Lang } from '../i18n/ui';
+import { useTranslations } from '../i18n/utils';
+
+export interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<section class="relative pt-12 pb-20 md:pt-20 md:pb-32 overflow-hidden">
+  <!-- Background Glow & Accents -->
+  <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-blue-600/15 rounded-full blur-3xl pointer-events-none -z-10"></div>
+  <div class="absolute top-0 right-0 w-[400px] h-[300px] bg-indigo-600/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-3xl mx-auto text-center">
+      <!-- Badge -->
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/90 border border-slate-800 text-xs text-blue-400 font-medium mb-8 backdrop-blur-md shadow-sm">
+        <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+        <span>{t('hero.badge')}</span>
+      </div>
+
+      <!-- Main Headline -->
+      <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.15] mb-6">
+        {t('hero.title')}
+      </h1>
+
+      <!-- Subtitle -->
+      <p class="text-lg sm:text-xl text-slate-300 leading-relaxed mb-10 max-w-2xl mx-auto">
+        {t('hero.subtitle')}
+      </p>
+
+      <!-- CTA Action Buttons -->
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+        <button
+          type="button"
+          data-open-modal="contact-modal"
+          class="w-full sm:w-auto px-8 py-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-base transition-all duration-200 shadow-xl shadow-blue-600/25 hover:shadow-blue-600/40 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-400"
+        >
+          {t('hero.cta.primary')}
+        </button>
+      </div>
+
+      <!-- Live Metrics with Semantic DL/DT/DD -->
+      <dl class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 pt-10 border-t border-slate-800/80">
+        <div class="p-4 rounded-2xl bg-slate-900/40 border border-slate-800/60 backdrop-blur-sm flex flex-col justify-center">
+          <dd class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight font-mono order-1">{t('hero.stat.1.val')}</dd>
+          <dt class="text-xs sm:text-sm text-slate-400 mt-1 order-2">{t('hero.stat.1.label')}</dt>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-slate-900/40 border border-slate-800/60 backdrop-blur-sm flex flex-col justify-center">
+          <dd class="text-2xl sm:text-3xl font-extrabold text-blue-400 tracking-tight font-mono order-1">{t('hero.stat.2.val')}</dd>
+          <dt class="text-xs sm:text-sm text-slate-400 mt-1 order-2">{t('hero.stat.2.label')}</dt>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-slate-900/40 border border-slate-800/60 backdrop-blur-sm flex flex-col justify-center">
+          <dd class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight font-mono order-1">{t('hero.stat.3.val')}</dd>
+          <dt class="text-xs sm:text-sm text-slate-400 mt-1 order-2">{t('hero.stat.3.label')}</dt>
+        </div>
+      </dl>
+    </div>
+  </div>
+</section>
