@@ -1,0 +1,84 @@
+---
+import { type Lang } from '../i18n/ui';
+import { useTranslations } from '../i18n/utils';
+
+export interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const features = [
+  {
+    title: t('features.item1.title'),
+    desc: t('features.item1.desc'),
+    badge: t('features.item1.badge'),
+    icon: `M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4`,
+  },
+  {
+    title: t('features.item2.title'),
+    desc: t('features.item2.desc'),
+    badge: t('features.item2.badge'),
+    icon: `M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z`,
+  },
+  {
+    title: t('features.item3.title'),
+    desc: t('features.item3.desc'),
+    badge: t('features.item3.badge'),
+    icon: `M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4`,
+  },
+  {
+    title: t('features.item4.title'),
+    desc: t('features.item4.desc'),
+    badge: t('features.item4.badge'),
+    icon: `M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z`,
+  },
+];
+---
+
+<section id="features" class="py-20 md:py-28 bg-slate-950/60 relative">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Section Header -->
+    <div class="text-center max-w-3xl mx-auto mb-16 md:mb-20">
+      <span class="text-xs font-bold uppercase tracking-widest text-blue-500 bg-blue-500/10 px-3.5 py-1.5 rounded-full border border-blue-500/20">
+        {t('features.tag')}
+      </span>
+      <h2 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight mt-4 mb-4">
+        {t('features.title')}
+      </h2>
+      <p class="text-base sm:text-lg text-slate-400">
+        {t('features.subtitle')}
+      </p>
+    </div>
+
+    <!-- 4 Cards Grid (1 col mobile, 2 cols tablet, 4 cols desktop) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {
+        features.map((feature) => (
+          <div class="group relative rounded-3xl bg-slate-900/60 border border-slate-800 p-6 sm:p-8 hover:border-slate-700 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-blue-500/5 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-6">
+                <div class="w-12 h-12 rounded-2xl bg-blue-600/10 border border-blue-500/20 text-blue-400 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={feature.icon} />
+                  </svg>
+                </div>
+                <span class="text-[11px] font-mono font-medium text-slate-400 bg-slate-800/80 px-2.5 py-1 rounded-full">
+                  {feature.badge}
+                </span>
+              </div>
+
+              <h3 class="text-lg font-bold text-white mb-3 group-hover:text-blue-400 transition-colors">
+                {feature.title}
+              </h3>
+              <p class="text-sm text-slate-400 leading-relaxed">
+                {feature.desc}
+              </p>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
