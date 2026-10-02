@@ -1,0 +1,62 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import MobileMenu from '../../components/MobileMenu.astro';
+import Hero from '../../components/Hero.astro';
+import Features from '../../components/Features.astro';
+import FaqAccordion from '../../components/FaqAccordion.astro';
+import CtaBanner from '../../components/CtaBanner.astro';
+import Footer from '../../components/Footer.astro';
+import Modal from '../../components/Modal.astro';
+import { languages, type Lang } from '../../i18n/ui';
+import { useTranslations } from '../../i18n/utils';
+
+export function getStaticPaths() {
+  return (Object.keys(languages) as Lang[]).map((lang) => ({
+    params: { lang },
+  }));
+}
+
+const { lang } = Astro.params as { lang: Lang };
+const t = useTranslations(lang);
+---
+
+<BaseLayout lang={lang}>
+  <!-- Sticky Header & Mobile Drawer -->
+  <Header lang={lang} />
+  <MobileMenu lang={lang} />
+
+  <!-- Main Content with flex-1 grow for reliable sticky footer -->
+  <main class="flex-1 grow">
+    <Hero lang={lang} />
+    <Features lang={lang} />
+
+    <!-- FAQ Section -->
+    <section id="faq" class="py-20 md:py-28 relative">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-3xl mx-auto mb-16">
+          <span class="text-xs font-bold uppercase tracking-widest text-blue-500 bg-blue-500/10 px-3.5 py-1.5 rounded-full border border-blue-500/20">
+            {t('faq.tag')}
+          </span>
+          <h2 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight mt-4 mb-4">
+            {t('faq.title')}
+          </h2>
+          <p class="text-base sm:text-lg text-slate-400">
+            {t('faq.subtitle')}
+          </p>
+        </div>
+
+        <FaqAccordion lang={lang} />
+      </div>
+    </section>
+
+    <!-- Final Call to Action -->
+    <CtaBanner lang={lang} />
+  </main>
+
+  <!-- Footer -->
+  <Footer lang={lang} />
+
+  <!-- Global Modals -->
+  <Modal id="contact-modal" lang={lang} />
+</BaseLayout>
