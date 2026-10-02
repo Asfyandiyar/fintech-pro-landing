@@ -1,0 +1,68 @@
+---
+import { type Lang } from '../i18n/ui';
+import { useTranslations } from '../i18n/utils';
+import LanguageSwitch from './LanguageSwitch.astro';
+
+export interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="border-t border-slate-800/80 bg-slate-950 py-12 md:py-16">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col md:flex-row items-center justify-between gap-8 pb-12 border-b border-slate-800/60">
+      <!-- Logo & Description -->
+      <div class="flex flex-col items-center md:items-start text-center md:text-left max-w-sm">
+        <a href={`/${lang}/`} class="flex items-center gap-3 mb-3">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-md shadow-blue-500/20">
+            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </div>
+          <span class="text-lg font-bold text-white tracking-tight">FinTech<span class="text-blue-500">Pro</span></span>
+        </a>
+        <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
+          {t('footer.desc')}
+        </p>
+      </div>
+
+      <!-- Footer Nav -->
+      <nav class="flex flex-wrap items-center justify-center gap-6 text-sm font-medium text-slate-400">
+        <a href="#features" class="hover:text-white transition-colors">
+          {t('nav.features')}
+        </a>
+        <a href="#faq" class="hover:text-white transition-colors">
+          {t('nav.faq')}
+        </a>
+        <a href="#contact" class="hover:text-white transition-colors">
+          {t('nav.contact')}
+        </a>
+      </nav>
+
+      <!-- Language Switch -->
+      <div class="flex items-center gap-3">
+        <span class="text-xs text-slate-400 hidden sm:inline">Язык / Lang:</span>
+        <LanguageSwitch currentLang={lang} />
+      </div>
+    </div>
+
+    <!-- Bottom Copyright -->
+    <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+      <div>
+        &copy; {currentYear} FinTech Pro. {t('footer.rights')}
+      </div>
+      <div class="flex items-center gap-6">
+        <a href={`/${lang}/privacy`} class="hover:text-slate-300 transition-colors">
+          {t('footer.privacy')}
+        </a>
+        <a href={`/${lang}/terms`} class="hover:text-slate-300 transition-colors">
+          {t('footer.terms')}
+        </a>
+      </div>
+    </div>
+  </div>
+</footer>
