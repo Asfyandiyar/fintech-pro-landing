@@ -1,0 +1,36 @@
+---
+import { type Lang } from '../i18n/ui';
+import { useTranslations } from '../i18n/utils';
+
+export interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<section id="contact" class="py-20 md:py-28 relative overflow-hidden">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="relative rounded-3xl bg-gradient-to-b from-blue-950/60 to-slate-900 border border-blue-500/20 p-8 sm:p-12 md:p-16 text-center shadow-2xl overflow-hidden">
+      <!-- Glow effect -->
+      <div class="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="relative z-10 max-w-2xl mx-auto">
+        <h2 class="text-2xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight mb-6">
+          {t('cta.title')}
+        </h2>
+        <p class="text-base sm:text-lg text-slate-300 leading-relaxed mb-10">
+          {t('cta.subtitle')}
+        </p>
+        <button
+          type="button"
+          data-open-modal="contact-modal"
+          class="w-full sm:w-auto px-8 py-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-base transition-all duration-200 shadow-xl shadow-blue-600/30 hover:shadow-blue-600/50 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-400"
+        >
+          {t('cta.button')}
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
