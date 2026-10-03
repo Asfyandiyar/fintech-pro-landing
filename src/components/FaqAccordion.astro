@@ -1,0 +1,145 @@
+---
+import { type Lang } from '../i18n/ui';
+import { useTranslations } from '../i18n/utils';
+
+export interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const faqItems = [
+  { q: t('faq.q1'), a: t('faq.a1') },
+  { q: t('faq.q2'), a: t('faq.a2') },
+  { q: t('faq.q3'), a: t('faq.a3') },
+  { q: t('faq.q4'), a: t('faq.a4') },
+];
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqItems.map((item) => ({
+    '@type': 'Question',
+    name: item.q,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: item.a,
+    },
+  })),
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+
+<faq-accordion class="block w-full max-w-3xl mx-auto space-y-4">
+  {
+    faqItems.map((item, index) => {
+      const questionId = `faq-btn-${index}`;
+      const answerId = `faq-ans-${index}`;
+      return (
+        <div class="faq-item rounded-2xl border border-slate-800 bg-slate-900/50 backdrop-blur-sm transition-colors duration-200 overflow-hidden">
+          <button
+            type="button"
+            id={questionId}
+            aria-expanded="false"
+            aria-controls={answerId}
+            class="faq-trigger w-full px-6 py-5 flex items-center justify-between text-left text-base sm:text-lg font-semibold text-slate-100 hover:text-blue-400 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 cursor-pointer"
+          >
+            <span>{item.q}</span>
+            <span class="faq-icon ml-4 flex-shrink-0 w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 transition-transform duration-300">
+              <svg class="w-4 h-4 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </span>
+          </button>
+
+          <div
+            id={answerId}
+            role="region"
+            aria-labelledby={questionId}
+            class="faq-content invisible grid grid-rows-[0fr] transition-[grid-template-rows,visibility] duration-300 ease-out"
+          >
+            <div class="overflow-hidden">
+              <div class="px-6 pb-6 text-sm sm:text-base text-slate-400 leading-relaxed border-t border-slate-800/40 pt-4">
+                {item.a}
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    })
+  }
+</faq-accordion>
+
+<script>
+  class FaqAccordion extends HTMLElement {
+    private handleClick = (e: MouseEvent) => {
+      const trigger = (e.target as HTMLElement).closest<HTMLButtonElement>('.faq-trigger');
+      if (!trigger || !this.contains(trigger)) return;
+
+      this.toggle(trigger);
+    };
+
+    connectedCallback() {
+      this.addEventListener('click', this.handleClick);
+    }
+
+    disconnectedCallback() {
+      this.removeEventListener('click', this.handleClick);
+    }
+
+    private toggle(clickedTrigger: HTMLButtonElement) {
+      const isExpanded = clickedTrigger.getAttribute('aria-expanded') === 'true';
+      const targetId = clickedTrigger.getAttribute('aria-controls');
+      if (!targetId) return;
+
+      const content = this.querySelector<HTMLElement>(`#${targetId}`);
+      const icon = clickedTrigger.querySelector<HTMLElement>('.faq-icon');
+      const allTriggers = this.querySelectorAll<HTMLButtonElement>('.faq-trigger');
+
+      // Close other accordions for a clean single-open accordion UX
+      allTriggers.forEach((otherTrigger) => {
+        if (otherTrigger !== clickedTrigger && otherTrigger.getAttribute('aria-expanded') === 'true') {
+          otherTrigger.setAttribute('aria-expanded', 'false');
+          const otherId = otherTrigger.getAttribute('aria-controls');
+          const otherContent = otherId ? this.querySelector<HTMLElement>(`#${otherId}`) : null;
+          const otherIcon = otherTrigger.querySelector<HTMLElement>('.faq-icon');
+          
+          if (otherContent) {
+            otherContent.classList.remove('grid-rows-[1fr]', 'visible');
+            otherContent.classList.add('grid-rows-[0fr]', 'invisible');
+          }
+          if (otherIcon) {
+            otherIcon.classList.remove('rotate-180', 'bg-blue-600', 'text-white');
+          }
+        }
+      });
+
+      // Toggle current
+      if (isExpanded) {
+        clickedTrigger.setAttribute('aria-expanded', 'false');
+        if (content) {
+          content.classList.remove('grid-rows-[1fr]', 'visible');
+          content.classList.add('grid-rows-[0fr]', 'invisible');
+        }
+        if (icon) {
+          icon.classList.remove('rotate-180', 'bg-blue-600', 'text-white');
+        }
+      } else {
+        clickedTrigger.setAttribute('aria-expanded', 'true');
+        if (content) {
+          content.classList.remove('grid-rows-[0fr]', 'invisible');
+          content.classList.add('grid-rows-[1fr]', 'visible');
+        }
+        if (icon) {
+          icon.classList.add('rotate-180', 'bg-blue-600', 'text-white');
+        }
+      }
+    }
+  }
+
+  if (!customElements.get('faq-accordion')) {
+    customElements.define('faq-accordion', FaqAccordion);
+  }
+</script>
