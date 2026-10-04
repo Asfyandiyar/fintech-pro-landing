@@ -1,0 +1,40 @@
+---
+import { defaultLang } from '../i18n/ui';
+---
+
+<!doctype html>
+<html lang={defaultLang}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>404 — Redirecting...</title>
+    <script is:inline define:vars={{ defaultLang }}>
+      (function() {
+        var path = window.location.pathname;
+        var segments = path.split('/').filter(Boolean);
+        var targetLang = defaultLang;
+
+        if (segments.length > 0 && (segments[0] === 'en' || segments[0] === 'ru')) {
+          targetLang = segments[0];
+        } else if (document.referrer) {
+          try {
+            var ref = new URL(document.referrer);
+            if (ref.origin === window.location.origin) {
+              var refSegments = ref.pathname.split('/').filter(Boolean);
+              if (refSegments.length > 0 && (refSegments[0] === 'en' || refSegments[0] === 'ru')) {
+                targetLang = refSegments[0];
+              }
+            }
+          } catch (e) {}
+        }
+
+        window.location.replace('/' + targetLang + '/404/');
+      })();
+    </script>
+  </head>
+  <body class="bg-slate-950 text-slate-400 flex items-center justify-center min-h-screen">
+    <noscript>
+      <p>Page not found. <a href="/ru/404/" class="text-blue-500 underline">Перейти на страницу 404</a></p>
+    </noscript>
+  </body>
+</html>
