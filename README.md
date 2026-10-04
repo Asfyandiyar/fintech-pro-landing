@@ -1,43 +1,56 @@
-# Astro Starter Kit: Minimal
+# FinTech Pro — Мультиязычный лендинг (Astro 7 + Tailwind v4)
 
-```sh
-npm create astro@latest -- --template minimal
-```
+Прототип двуязычного корпоративного лендинга (RU / EN) с нативным i18n-роутингом, валидацией доступности (WAI-ARIA) и оптимизацией под поисковые требования (SEO).
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Технологический стек
+- **Framework:** Astro 7 (Static Site Generation, островная архитектура)
+- **CSS:** Tailwind CSS v4 (интеграция через Vite-плагин `@tailwindcss/vite`)
+- **Language:** TypeScript (строгий режим `strict: true`, без использования `any`)
+- **SEO & Microdata:** JSON-LD (схемы FinancialService и FAQPage), OpenGraph, hreflang, robots.txt
 
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
+## Структура проекта
 ```text
-/
 ├── public/
+│   └── robots.txt               # Инструкции индексации для поисковых роботов
 ├── src/
+│   ├── components/              # Изолированные UI-компоненты
+│   │   ├── Header.astro         # Шапка со скролл-эффектом (кастомный элемент <main-header>)
+│   │   ├── MobileMenu.astro     # Меню-drawer с Focus Trap и transitionend lifecycle
+│   │   ├── LanguageSwitch.astro # Переключатель локалей
+│   │   ├── Hero.astro           # Секция Hero с семантической разметкой списков <dl>
+│   │   ├── Features.astro       # Сетка преимуществ с локализованным контентом
+│   │   ├── FaqAccordion.astro   # Аккордеон на CSS Grid с переключением visibility
+│   │   ├── CtaBanner.astro      # Блок призыва к действию с триггером модального окна
+│   │   ├── Footer.astro         # Подвал с динамическим выводом года сборки
+│   │   └── Modal.astro          # Модальное окно с формой и экраном успешной отправки
+│   ├── i18n/
+│   │   ├── ui.ts                # Словари локализации (RU/EN)
+│   │   └── utils.ts             # Хелперы определения языка и сборки путей
+│   ├── layouts/
+│   │   └── BaseLayout.astro     # Базовый HTML-каркас (мета-теги, канонические ссылки)
 │   └── pages/
-│       └── index.astro
-└── package.json
+│       ├── [lang]/
+│       │   ├── index.astro      # Динамический роутинг локалей главной страницы
+│       │   └── 404.astro        # Изолированные статические 404 страницы (Zero-Flicker SSG)
+│       └── 404.astro            # Корневой инлайн-диспетчер (Smart Router в <head>)
+└── astro.config.mjs             # Конфигурация Astro и i18n-стратегии
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## Интерактивные компоненты и логика
+Все динамические элементы реализованы на нативных Web Components (Custom Elements), изолированы и очищают слушатели событий при демонтаже (`disconnectedCallback`).
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+- **Header / MobileMenu:** Управление шторкой меню вынесено на глобальную шину событий через `CustomEvent`. Внутри мобильного меню заперт фокус клавиатуры (Focus Trap) для корректной навигации по Tab / Shift+Tab. Переключение pointer-events завязано на событие `transitionend` панели.
+- **FaqAccordion:** Раскрытие секций реализовано через анимацию CSS Grid (`grid-template-rows: 0fr -> 1fr`). Для закрытых вкладок динамически применяется класс `invisible`, что исключает попадание фокуса на скрытые элементы. Секция автоматически рендерит валидный структурированный JSON-LD для Google/Яндекс.
+- **Modal:** Работает в режиме переключения экранов. При отправке формы скрывается узел `form`, отображается блок успешной отправки, а метод `getVisibleFocusableElements()` динамически пересчитывает доступные для фокуса элементы, предотвращая сбои ловушки фокуса.
 
-Any static assets, like images, can be placed in the `public/` directory.
+## Конфигурация и адаптация под макеты
+1. **Цвета и темы:** Стилизация выполнена в Tailwind v4. Глобальные токены, блуры и цвета темы настраиваются в `src/styles/global.css` через директиву `@theme` или стандартные CSS-переменные в `:root`.
+2. **Управление текстами:** Весь контент лендинга, включая мета-теги, заголовки, пункты FAQ и подписи форм, изолирован в словаре `src/i18n/ui.ts`. Прямой хардкод строк в компонентах отсутствует.
 
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+## Команды разработки
+```bash
+npm install      # Установка зависимостей
+npm run dev      # Локальный dev-сервер
+npm run build    # Проверка типов TS и компиляция продакшн-бандла (папка dist)
+npm run preview  # Локальный запуск собранного бандла
+```
