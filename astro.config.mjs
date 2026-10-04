@@ -4,13 +4,13 @@ import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://example.com',
+  site: 'https://fintech-landing.demo',
   i18n: {
     defaultLocale: 'ru',
     locales: ['ru', 'en'],
     routing: {
       prefixDefaultLocale: true,
-      redirectToDefaultLocale: true
+      redirectToDefaultLocale: false
     }
   },
   vite: {
